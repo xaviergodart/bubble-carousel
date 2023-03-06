@@ -21,7 +21,6 @@ type Model struct {
 
 	content string
 	start   int
-	end     int
 }
 
 // KeyMap defines keybindings. It satisfies to the help.KeyMap interface, which
@@ -191,9 +190,10 @@ func (m *Model) UpdateViewport() {
 				strconv.Itoa(width),
 			),
 		)
-		if i == m.cursor && width > m.width {
+		if i == m.cursor && m.cursor < len(m.items)-1 && width > m.width {
 			m.start++
-			break
+		} else if i >= 0 && i == m.cursor && i < m.start {
+			m.start--
 		}
 	}
 	m.content = lipgloss.JoinHorizontal(lipgloss.Top, items[m.start:]...)
