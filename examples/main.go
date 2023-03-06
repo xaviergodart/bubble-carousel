@@ -58,6 +58,7 @@ func main() {
 		carousel.WithItems(items),
 		carousel.WithFocused(true),
 		carousel.WithHeight(7),
+		carousel.WithWidth(96),
 	)
 
 	s := carousel.DefaultStyles()
