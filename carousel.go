@@ -164,7 +164,11 @@ func (m *Model) Blur() {
 
 // View renders the component.
 func (m Model) View() string {
-	return ""
+	items := make([]string, 0, len(m.items))
+	for i := range m.items {
+		items = append(items, m.renderItem(i))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, items...)
 }
 
 // UpdateViewport updates the carousel content based on the previously defined
