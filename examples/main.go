@@ -23,6 +23,11 @@ func (m model) Init() tea.Cmd { return nil }
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.carousel.SetWidth(msg.Width)
+		m.carousel.SetHeight(msg.Height)
+		return m, nil
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
@@ -57,15 +62,13 @@ func main() {
 	t := carousel.New(
 		carousel.WithItems(items),
 		carousel.WithFocused(true),
-		carousel.WithHeight(7),
-		carousel.WithWidth(96),
 	)
 
-	s := carousel.DefaultStyles()
+	/*s := carousel.DefaultStyles()
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("57"))
-	t.SetStyles(s)
+	t.SetStyles(s)*/
 
 	m := model{t}
 	if _, err := tea.NewProgram(m).Run(); err != nil {
