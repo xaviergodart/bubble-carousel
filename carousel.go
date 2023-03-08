@@ -1,23 +1,24 @@
 package carousel
 
 import (
-	"strconv"
-
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
+const gap = 0
+
 // Model defines a state for the carousel widget.
 type Model struct {
 	KeyMap KeyMap
 
-	items  []string
-	cursor int
-	width  int
-	height int
-	focus  bool
-	styles Styles
+	items     []string
+	itemWidth int
+	cursor    int
+	width     int
+	height    int
+	focus     bool
+	styles    Styles
 
 	content string
 	start   int
@@ -57,7 +58,7 @@ func DefaultStyles() Styles {
 	return Styles{
 		Item: lipgloss.NewStyle().Padding(0, 1),
 		Selected: lipgloss.NewStyle().
-			Bold(true).
+			Padding(0, 1).
 			Foreground(lipgloss.Color("212")),
 	}
 }
@@ -94,7 +95,7 @@ func New(opts ...Option) Model {
 // WithItems sets the carousel items (data).
 func WithItems(items []string) Option {
 	return func(m *Model) {
-		m.items = items
+		m.SetItems(items)
 	}
 }
 
@@ -181,26 +182,28 @@ func (m *Model) UpdateViewport() {
 	items := make([]string, 0, len(m.items))
 	width := 0
 	m.end = len(m.items)
+
 	for i := range m.items {
 		item := m.renderItem(i)
 		if i >= m.start {
 			width += lipgloss.Width(item)
 		}
-		items = append(
-			items,
-			lipgloss.JoinVertical(
-				lipgloss.Center,
-				item,
-				strconv.Itoa(width),
-			),
-		)
-		if i == m.cursor && m.cursor <= len(m.items)-1 && width >= m.width {
+		items = append(items, item)
+		if i == m.cursor && m.cursor <= len(m.items)-1 && width > m.width {
 			m.start++
-		} else if i == m.cursor && i >= 0 && i <= m.start-1 {
+		}
+
+		if i == m.cursor && i >= 0 && i <= m.start-1 {
 			m.start--
+			continue
+		}
+
+		if i > m.cursor && width > m.width {
+			m.end = i
+			break
 		}
 	}
-	m.content = lipgloss.JoinHorizontal(lipgloss.Top, items[m.start:m.end]...)
+	m.content = lipgloss.JoinHorizontal(lipgloss.Center, items[m.start:m.end]...)
 }
 
 // SelectedItem returns the selected item.
@@ -217,12 +220,18 @@ func (m Model) Items() []string {
 // SetItems sets a new items state.
 func (m *Model) SetItems(items []string) {
 	m.items = items
+	m.itemWidth = 0
+	for i := range m.items {
+		item := m.renderItem(i)
+		items = append(items, item)
+		m.itemWidth = max(m.itemWidth, lipgloss.Width(item))
+	}
 	m.UpdateViewport()
 }
 
 // SetWidth sets the width of the carousel.
 func (m *Model) SetWidth(w int) {
-	m.width = w
+	m.width = w - gap
 	m.UpdateViewport()
 }
 
@@ -268,11 +277,19 @@ func (m *Model) MoveRight() {
 }
 
 func (m *Model) renderItem(itemID int) string {
+	var item string
 	if itemID == m.cursor {
-		return m.styles.Selected.Render(string(m.items[itemID]))
+		item = m.styles.Selected.Render(string(m.items[itemID]))
+	} else {
+		item = m.styles.Item.Render(string(m.items[itemID]))
 	}
-
-	return m.styles.Item.Render(string(m.items[itemID]))
+	return lipgloss.Place(
+		m.itemWidth,
+		m.height,
+		lipgloss.Left,
+		lipgloss.Center,
+		item,
+	)
 }
 
 func max(a, b int) int {
