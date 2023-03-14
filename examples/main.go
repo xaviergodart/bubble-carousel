@@ -40,7 +40,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "enter":
 			return m, tea.Batch(
-				tea.Printf("Let's go to %s!", m.carousel.SelectedItem()[1]),
+				tea.Printf("Let's go to %s!", m.carousel.SelectedItem()),
 			)
 		}
 	}
@@ -62,13 +62,14 @@ func main() {
 	t := carousel.New(
 		carousel.WithItems(items),
 		carousel.WithFocused(true),
+		carousel.WithEvenlySpacedItems(),
 	)
 
-	/*s := carousel.DefaultStyles()
+	s := carousel.DefaultStyles()
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("57"))
-	t.SetStyles(s)*/
+	t.SetStyles(s)
 
 	m := model{t}
 	if _, err := tea.NewProgram(m).Run(); err != nil {

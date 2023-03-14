@@ -6,23 +6,24 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const gap = 0
+const gap = 2
 
 // Model defines a state for the carousel widget.
 type Model struct {
 	KeyMap KeyMap
 
-	items     []string
-	itemWidth int
-	cursor    int
-	width     int
-	height    int
-	focus     bool
-	styles    Styles
+	items        []string
+	cursor       int
+	width        int
+	height       int
+	focus        bool
+	evenlySpaced bool
+	styles       Styles
 
-	content string
-	start   int
-	end     int
+	content   string
+	itemWidth int
+	start     int
+	end       int
 }
 
 // KeyMap defines keybindings. It satisfies to the help.KeyMap interface, which
@@ -66,12 +67,12 @@ func DefaultStyles() Styles {
 // SetStyles sets the table styles.
 func (m *Model) SetStyles(s Styles) {
 	m.styles = s
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // Option is used to set options in New. For example:
 //
-//	table := New(WithColumns([]Column{{Title: "ID", Width: 10}}))
+//	carousel := New(WithItems([]string{"Item 1", "Item 2", "Item 3"}))
 type Option func(*Model)
 
 // New creates a new model for the carousel widget.
@@ -87,7 +88,7 @@ func New(opts ...Option) Model {
 		opt(&m)
 	}
 
-	m.UpdateViewport()
+	m.UpdateSize()
 
 	return m
 }
@@ -99,28 +100,35 @@ func WithItems(items []string) Option {
 	}
 }
 
-// WithHeight sets the height of the table.
+// WithEvenlySpacedItems sets all items with the same width.
+func WithEvenlySpacedItems() Option {
+	return func(m *Model) {
+		m.evenlySpaced = true
+	}
+}
+
+// WithHeight sets the height of the carousel.
 func WithHeight(h int) Option {
 	return func(m *Model) {
 		m.height = h
 	}
 }
 
-// WithWidth sets the width of the table.
+// WithWidth sets the width of the carousel.
 func WithWidth(w int) Option {
 	return func(m *Model) {
 		m.width = w
 	}
 }
 
-// WithFocused sets the focus state of the table.
+// WithFocused sets the focus state of the carousel.
 func WithFocused(f bool) Option {
 	return func(m *Model) {
 		m.focus = f
 	}
 }
 
-// WithStyles sets the table styles.
+// WithStyles sets the carousel styles.
 func WithStyles(s Styles) Option {
 	return func(m *Model) {
 		m.styles = s
@@ -162,13 +170,13 @@ func (m Model) Focused() bool {
 // interact.
 func (m *Model) Focus() {
 	m.focus = true
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // Blur blurs the carousel, preventing selection or movement.
 func (m *Model) Blur() {
 	m.focus = false
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // View renders the component.
@@ -176,9 +184,9 @@ func (m Model) View() string {
 	return m.content
 }
 
-// UpdateViewport updates the carousel content based on the previously defined
-// items
-func (m *Model) UpdateViewport() {
+// UpdateSize updates the carousel size based on the previously defined
+// items and width.
+func (m *Model) UpdateSize() {
 	items := make([]string, 0, len(m.items))
 	width := 0
 	m.end = len(m.items)
@@ -233,19 +241,19 @@ func (m *Model) SetItems(items []string) {
 		items = append(items, item)
 		m.itemWidth = max(m.itemWidth, lipgloss.Width(item))
 	}
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // SetWidth sets the width of the carousel.
 func (m *Model) SetWidth(w int) {
 	m.width = w - gap
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // SetHeight sets the height of the carousel.
 func (m *Model) SetHeight(h int) {
 	m.height = h
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // Height returns the height of the carousel.
@@ -266,21 +274,21 @@ func (m Model) Cursor() int {
 // SetCursor sets the cursor position in the carousel.
 func (m *Model) SetCursor(n int) {
 	m.cursor = clamp(n, 0, len(m.items)-1)
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // MoveLeft moves the selection left by one item..
 // It can not go before the first item.
 func (m *Model) MoveLeft() {
 	m.cursor = clamp(m.cursor-1, 0, len(m.items)-1)
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 // MoveDown moves the selection right by one item.
 // It can not go after the last row.
 func (m *Model) MoveRight() {
 	m.cursor = clamp(m.cursor+1, 0, len(m.items)-1)
-	m.UpdateViewport()
+	m.UpdateSize()
 }
 
 func (m *Model) renderItem(itemID int) string {
@@ -290,13 +298,18 @@ func (m *Model) renderItem(itemID int) string {
 	} else {
 		item = m.styles.Item.Render(m.items[itemID])
 	}
-	return lipgloss.Place(
-		m.itemWidth,
-		m.height,
-		lipgloss.Left,
-		lipgloss.Center,
-		item,
-	)
+
+	if m.evenlySpaced {
+		return lipgloss.Place(
+			m.itemWidth,
+			m.height,
+			lipgloss.Left,
+			lipgloss.Center,
+			item,
+		)
+	}
+
+	return item
 }
 
 func max(a, b int) int {
