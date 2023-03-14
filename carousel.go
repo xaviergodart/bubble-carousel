@@ -185,17 +185,20 @@ func (m *Model) UpdateViewport() {
 
 	for i := range m.items {
 		item := m.renderItem(i)
+
 		if i >= m.start {
 			width += lipgloss.Width(item)
 		}
+
 		items = append(items, item)
-		if i == m.cursor && m.cursor <= len(m.items)-1 && width > m.width {
+
+		if i == m.cursor && width > m.width {
 			m.start++
 		}
 
-		if i == m.cursor && i >= 0 && i <= m.start-1 {
+		if i == m.cursor && i < m.start {
 			m.start--
-			continue
+			width += lipgloss.Width(item)
 		}
 
 		if i > m.cursor && width > m.width {
@@ -203,7 +206,11 @@ func (m *Model) UpdateViewport() {
 			break
 		}
 	}
-	m.content = lipgloss.JoinHorizontal(lipgloss.Center, items[m.start:m.end]...)
+
+	m.content = lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		items[m.start:m.end]...,
+	)
 }
 
 // SelectedItem returns the selected item.
@@ -279,9 +286,9 @@ func (m *Model) MoveRight() {
 func (m *Model) renderItem(itemID int) string {
 	var item string
 	if itemID == m.cursor {
-		item = m.styles.Selected.Render(string(m.items[itemID]))
+		item = m.styles.Selected.Render(m.items[itemID])
 	} else {
-		item = m.styles.Item.Render(string(m.items[itemID]))
+		item = m.styles.Item.Render(m.items[itemID])
 	}
 	return lipgloss.Place(
 		m.itemWidth,
