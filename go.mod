@@ -1,4 +1,4 @@
-module github/xaviergodart/bubble-carousel
+module github.com/xaviergodart/bubble-carousel
 
 go 1.19
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	carousel "github/xaviergodart/bubble-carousel"
+	carousel "github.com/xaviergodart/bubble-carousel"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
