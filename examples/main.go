@@ -25,7 +25,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.carousel.SetWidth(msg.Width - 2)
-		m.carousel.SetHeight(3)
 		return m, nil
 
 	case tea.KeyMsg:

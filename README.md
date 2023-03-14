@@ -5,3 +5,4 @@
 
 A carousel component for bubbletea applications.
 
+![carousel gif](carousel.gif)
