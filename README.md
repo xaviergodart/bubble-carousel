@@ -6,3 +6,5 @@
 A carousel component for bubbletea applications.
 
 ![carousel gif](carousel.gif)
+
+Check the [example](examples/main.go).
