@@ -204,11 +204,13 @@ func (m *Model) UpdateSize() {
 
 		if i == m.cursor && i < m.start {
 			m.start--
+
 			width += lipgloss.Width(item)
 		}
 
 		if i > m.cursor && width > m.width {
 			m.end = i
+
 			break
 		}
 	}

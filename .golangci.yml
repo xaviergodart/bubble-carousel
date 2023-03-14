@@ -1,24 +1,8 @@
 linters:
-  enable-all: true
-  disable:
-    - golint
-    - interfacer
-    - scopelint
-    - maligned
-    - rowserrcheck
-    - funlen
-    - depguard
-    - goerr113
-    - exhaustivestruct
-    - testpackage
-    - gochecknoglobals
-    - wrapcheck
-    - forbidigo
-    - ifshort
-    - cyclop
-    - varnamelen
-    - ireturn
-    - nilnil
-    - gosec
-    - exhaustruct
-    - nonamedreturns
+  enable:
+    - thelper
+    - gofumpt
+    - tparallel
+    - unconvert
+    - unparam
+    - revive
