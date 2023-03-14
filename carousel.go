@@ -6,8 +6,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const gap = 2
-
 // Model defines a state for the carousel widget.
 type Model struct {
 	KeyMap KeyMap
@@ -246,7 +244,7 @@ func (m *Model) SetItems(items []string) {
 
 // SetWidth sets the width of the carousel.
 func (m *Model) SetWidth(w int) {
-	m.width = w - gap
+	m.width = w
 	m.UpdateSize()
 }
 
