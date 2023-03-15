@@ -222,7 +222,6 @@ func (m *Model) UpdateSize() {
 }
 
 // SelectedItem returns the selected item.
-// You can cast it to your own implementation.
 func (m Model) SelectedItem() string {
 	return m.items[m.cursor]
 }
