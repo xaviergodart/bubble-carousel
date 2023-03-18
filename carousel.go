@@ -237,7 +237,6 @@ func (m *Model) SetItems(items []string) {
 	m.itemWidth = 0
 	for i := range m.items {
 		item := m.renderItem(i)
-		items = append(items, item)
 		m.itemWidth = max(m.itemWidth, lipgloss.Width(item))
 	}
 	m.UpdateSize()
