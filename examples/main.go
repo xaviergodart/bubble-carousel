@@ -11,8 +11,7 @@ import (
 )
 
 var baseStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("240"))
+	Margin(1, 1)
 
 type model struct {
 	carousel carousel.Model
@@ -48,7 +47,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return baseStyle.Render(m.carousel.View()) + "\n"
+	var left, right string
+	if m.carousel.HasLeftItems() {
+		left = "◀"
+	}
+	if m.carousel.HasRightItems() {
+		right = "▶"
+	}
+	return lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		left,
+		baseStyle.Render(m.carousel.View()),
+		right,
+	)
 }
 
 func main() {
@@ -65,7 +76,9 @@ func main() {
 	)
 
 	s := carousel.DefaultStyles()
+	s.Item = s.Item.Padding(1, 1)
 	s.Selected = s.Selected.
+		Padding(1, 1).
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("57"))
 	t.SetStyles(s)

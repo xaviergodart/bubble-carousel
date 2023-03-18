@@ -269,6 +269,16 @@ func (m Model) Cursor() int {
 	return m.cursor
 }
 
+// HasRightItems returns true if there's items left on the right.
+func (m Model) HasRightItems() bool {
+	return m.end < len(m.items)
+}
+
+// HasLeftItems returns true if there's items left on the left.
+func (m Model) HasLeftItems() bool {
+	return m.start > 0
+}
+
 // SetCursor sets the cursor position in the carousel.
 func (m *Model) SetCursor(n int) {
 	m.cursor = clamp(n, 0, len(m.items)-1)
