@@ -198,7 +198,7 @@ func (m *Model) UpdateSize() {
 
 		items = append(items, item)
 
-		if i == m.cursor && width > m.width {
+		if i <= m.cursor && width > m.width {
 			m.start++
 		}
 
